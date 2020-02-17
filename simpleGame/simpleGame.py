@@ -184,16 +184,28 @@ while 1:
             if keys[pygame.K_a]:
                 player1.move(4,the_world)
 
-            if keys[pygame.K_UP]:
-                player2.move(1,the_world)
-            if keys[pygame.K_RIGHT]:
-                player2.move(2,the_world)
-            if keys[pygame.K_DOWN]:
-                player2.move(3, the_world)
-            if keys[pygame.K_LEFT]:
-                player2.move(4,the_world)
+            var_exists = False
+            try:
+                player2
+            except NameError:
+                var_exists = False
+            else:
+                var_exists = True
 
-    text = font.render(str("player1: " + str(player1.score) + "   player2: " + str(player2.score)), True, (0, 128, 0))
+            if var_exists:
+                if keys[pygame.K_UP]:
+                    player2.move(1,the_world)
+                if keys[pygame.K_RIGHT]:
+                    player2.move(2,the_world)
+                if keys[pygame.K_DOWN]:
+                    player2.move(3, the_world)
+                if keys[pygame.K_LEFT]:
+                    player2.move(4,the_world)
+
+    if var_exists:
+        text = font.render(str("player1: " + str(player1.score) + "   player2: " + str(player2.score)), True, (0, 128, 0))
+    else:
+        text = font.render(str("player1: " + str(player1.score)), True,  (0, 128, 0))
     screen.blit(text, (10, 10))
 
     screen.fill(white)
