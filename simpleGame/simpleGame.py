@@ -30,6 +30,7 @@ class world():
                         self.world_matrix[x,y] = 1
 
         #test enemy
+        """
         enemydrawn = False
         for y in range(0, self.world_y_size):
             if enemydrawn == False:
@@ -42,6 +43,7 @@ class world():
                             break
             else:
                 break
+        """
 
 class player_entity():
     def __init__(self):
@@ -51,8 +53,10 @@ class player_entity():
         self.ate_food = False
         self.hit_enemy = False
         self.died = False
+        self.player_identifier = -1
 
-    def spawn(self, world_matrix):
+    def spawn(self, world_matrix, id):
+        self.player_identifier = id
         playerplaced = False
         for y in range(0, world_matrix.world_y_size):
             if playerplaced == False:
@@ -64,7 +68,7 @@ class player_entity():
                             self.world_x = x
                             self.world_y = y
                             #write location to world object -  these need to stay in sync.
-                            world_matrix.world_matrix[x, y] = 2
+                            world_matrix.world_matrix[x, y] = self.player_identifier
                             playerplaced = True
                             break
             else:
@@ -80,7 +84,7 @@ class player_entity():
                 if (the_world.world_matrix[self.world_x][self.world_y-1] == 3):
                     self.score += 100
                 the_world.world_matrix[self.world_x][self.world_y] = 0
-                the_world.world_matrix[self.world_x][self.world_y-1] = 2
+                the_world.world_matrix[self.world_x][self.world_y-1] = self.player_identifier
                 self.world_y += -1
 
         if direction == 3:
@@ -90,7 +94,7 @@ class player_entity():
                 if (the_world.world_matrix[self.world_x][self.world_y+1] == 3):
                     self.score += 100
                 the_world.world_matrix[self.world_x][self.world_y] = 0
-                the_world.world_matrix[self.world_x][self.world_y + 1] = 2
+                the_world.world_matrix[self.world_x][self.world_y + 1] = self.player_identifier
                 self.world_y += 1
 
         if direction == 2:
@@ -100,7 +104,7 @@ class player_entity():
                 if (the_world.world_matrix[self.world_x+1][self.world_y] == 3):
                     self.score += 100
                 the_world.world_matrix[self.world_x][self.world_y] = 0
-                the_world.world_matrix[self.world_x + 1][self.world_y] = 2
+                the_world.world_matrix[self.world_x + 1][self.world_y] = self.player_identifier
                 self.world_x += 1
 
         if direction == 4:
@@ -110,7 +114,7 @@ class player_entity():
                 if (the_world.world_matrix[self.world_x-1][self.world_y] == 3):
                     self.score += 100
                 the_world.world_matrix[self.world_x][self.world_y] = 0
-                the_world.world_matrix[self.world_x - 1][self.world_y] = 2
+                the_world.world_matrix[self.world_x - 1][self.world_y] = self.player_identifier
                 self.world_x += -1
 
     def look(self):
@@ -156,47 +160,45 @@ screen = pygame.display.set_mode(size)
 
 speed = [2, 2]
 white = 255, 255, 255
+font = pygame.font.SysFont(None, 72)
 
 #Player setup
 player1 = player_entity()
-player1.spawn(the_world)
+player1.spawn(the_world,2)
 player2 = player_entity()
-player2.spawn(the_world)
+player2.spawn(the_world,3)
+
 
 
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            player1.move(1,the_world)
-        if keys[pygame.K_d]:
-            player1.move(2,the_world)
-        if keys[pygame.K_s]:
-            player1.move(3, the_world)
-        if keys[pygame.K_a]:
-            player1.move(4,the_world)
+        if event.type == pygame.KEYDOWN:
+            if keys[pygame.K_w]:
+                player1.move(1,the_world)
+            if keys[pygame.K_d]:
+                player1.move(2,the_world)
+            if keys[pygame.K_s]:
+                player1.move(3, the_world)
+            if keys[pygame.K_a]:
+                player1.move(4,the_world)
 
-        if keys[pygame.K_UP]:
-            player2.move(1,the_world)
-        if keys[pygame.K_RIGHT]:
-            player2.move(2,the_world)
-        if keys[pygame.K_DOWN]:
-            player2.move(3, the_world)
-        if keys[pygame.K_LEFT]:
-            player2.move(4,the_world)
+            if keys[pygame.K_UP]:
+                player2.move(1,the_world)
+            if keys[pygame.K_RIGHT]:
+                player2.move(2,the_world)
+            if keys[pygame.K_DOWN]:
+                player2.move(3, the_world)
+            if keys[pygame.K_LEFT]:
+                player2.move(4,the_world)
+
+    text = font.render(str("player1: " + str(player1.score) + "   player2: " + str(player2.score)), True, (0, 128, 0))
+    screen.blit(text, (10, 10))
 
     screen.fill(white)
-    font = pygame.font.SysFont(None, 72)
-
-
     for y in range(0,the_world.world_y_size):
         for x in range(0,the_world.world_x_size):
-
-            #text = font.render(str(x) + " " + str(y), True, (0, 128, 0))
-            #screen.blit(text, (imagesize * x, imagesize * y))
-            text = font.render(str("player1: " + str(player1.score) + "   player2: " + str(player2.score)), True, (0, 128, 0))
-            screen.blit(text, (10, 10))
 
             #draw apple
             if the_world.world_matrix[x][y] == 1:
@@ -210,4 +212,5 @@ while 1:
             # draw enemy
             if the_world.world_matrix[x][y] == 3:
                 screen.blit(enemy, (imagesize * x, imagesize * y))
+
     pygame.display.flip()
